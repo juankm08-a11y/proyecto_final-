@@ -11,7 +11,6 @@ const consumer = kafka.consumewr({ groupId: "asistencia-processor" });
 const RABBITMQ_URL = "amqp://192.168.80.1";
 
 const EXCHANGE = "aula_exchange";
-const ROUTING_KEY = "asistencia.alerta";
 let rabbitChannel;
 
 async function conectRabbit() {
