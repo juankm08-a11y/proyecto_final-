@@ -1,36 +1,22 @@
-const { Kafka } = require("kafkajs");
-const { WebSocket } = require("ws");
+const express = require("express");
+const amqp = require("amqp");
+const cors = require("cors");
 
-const kafka = new Kafka({
-  clientId: "asistencia-backend",
-  brokers: ["kafka:9092"],
-});
+const app = express();
+app.use(express());
+app.use(cors());
 
-const consumer = kafka.consumer({ groupId: "asistencia-backend" });
-const wss = new WebSocket.Server({ port: 8082 });
+const RABBITMQ_URL = "amqp://192.168.80.1";
+const EXCHANGE = "aula_exchange";
+const ROUTING_KEY = "asistencia.alerta";
 
-wss.on("connection", (ws) => {
-  console.log("Cliente conectado al WebSocket");
-});
+let alertas = [];
+let channel;
 
-async function run() {
-  await consumer.connect();
-  await consumer.subscribe({
-    topic: "asistencia-summary",
-    fromBeginning: true,
-  });
-
-  await consumer.run({
-    eachMessage: async ({ message }) => {
-      const summary = JSON.parse(message.value);
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(summary));
-        }
-      });
-      console.log(`Enviado a WebSocket: ${JSON.stringify}`);
-    },
-  });
+async function conectRabbit() {
+  const connection = await amqp.connect(RABBITMQ_URL);
+  const channel = await connection.createChannel();
+  await channel.assertExchange(EXCHANGE, "direct", { durable: false });
+  console.log(`API conectada a Rabbit MQ y conectada a alertas`);
+  return channel;
 }
-
-run().catch(console.error);
