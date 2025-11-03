@@ -1,5 +1,4 @@
 const amqp = require("amqp");
-const { Kafka } = require("kafkajs");
 
 const RABBITMQ_URL = "amqp://192.168.80.1";
 const EXCHANGE = "aula_exchange";
