@@ -1,0 +1,107 @@
+version: "3.8"
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS:PLAINTEXT:
+      KAFKA_OFFSETS_TOPIC_APPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics", "--list", "--boostrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+    ports:
+      - "9092:9092"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  betting_api:
+    build: .
+    command: node betting_api.js
+    depends_on:
+      - kafka
+      - rabbitmq
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+    ports:
+      - "8080:8080"
+
+  match_generator:
+    build: .
+    command: node match_generator.js
+    depends_on:
+      - kafka
+      - rabbitmq
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+
+  match_simulator:
+    build: .
+    command: node match_simulator.js
+    depends_on:
+      - kafka
+      - rabbitmq
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+
+  results_engine:
+    build: .
+    command: node results_engine.js
+    depends_on:
+      - kafka
+      - rabbitmq
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+
+  dashboard_backend:
+    build: .
+    command: node dashboard_backend.js
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+
+  email_worker:
+    build: ./email_worker
+    command: node email_worker.js
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+    restart: always
