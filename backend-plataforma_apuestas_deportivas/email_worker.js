@@ -17,8 +17,8 @@ async function run() {
         connection.queue("", { exclusive: true }, (queue) => {
           queue.bind(EXCHANGE, ROUTING_KEY);
           queue.subscribe((message) => {
-            const alerta = message.data.toString();
-            console.log(`Enviando correo: ${alerta}`);
+            const texto = message.data.toString();
+            console.log(`Correo enviado: ${texto}`);
           });
         });
       }
