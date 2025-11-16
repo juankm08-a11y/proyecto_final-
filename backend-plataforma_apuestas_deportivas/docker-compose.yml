@@ -24,7 +24,13 @@ services:
       KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
     healthcheck:
       test:
-        ["CMD", "kafka-topics", "--list", "--boostrap-server", "localhost:9092"]
+        [
+          "CMD",
+          "kafka-topics",
+          "--list",
+          "--bootstrap-server",
+          "localhost:9092",
+        ]
       interval: 10s
       timeout: 30s
       retries: 5
