@@ -58,5 +58,5 @@ app.delete("/alertas", (req, res) => {
 const PORT = 8081;
 app.listen(PORT, async () => {
   console.log(`Backend corriendo en el puerto ${PORT}`);
-  await conectRabbit();
+  conectRabbit();
 });
