@@ -31,7 +31,25 @@ async function connectRabbit() {
 
 async function run() {
   await producer.connect();
-  const { exchange } = await conectRabbit;
+  const { exchange } = await connectRabbit();
+
+  setInterval(async () => {
+    const matchId = `match_${Math.floor(Math.random() * 1000)}`;
+    const odds = (Math.random() * (2.5 - 1.1) + 1.1).toFixed(2);
+    const msg = { matchId, odds, timestamp: new Date().toISOString() };
+
+    await producer.send({
+      topic: "bettings_events",
+      messages: [{ key: matchId, value: JSON.stringify(msg) }],
+    });
+
+    console.log(`Evento enviado a Kafka: ${JSON.stringify(msg)}`);
+
+    const alerta = `Nueva cuota disponible para ${matchId}: ${odds}`;
+    exchange.publish(ROUTING_KEY, Buffer.from(alerta));
+
+    console.log(`Alerta enviada a RabbitMQ: ${alerta}`);
+  }, 4000);
 }
 
 run().catch(console.error);
