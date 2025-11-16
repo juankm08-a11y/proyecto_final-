@@ -11,13 +11,21 @@ const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
 
 async function conectRabbit() {
-  const connection = amqp.createConnection({ url: RABBITMQ_URL });
+  return new Promise((resolve, reject) => {
+    const connection = amqp.createConnection({ url: RABBITMQ_URL });
 
-  connection.on("ready", () => {
-    console.log("Conectado a RabbitMQ");
+    connection.on("ready", () => {
+      console.log("Betting API conectado a RabbitMQ");
+
+      connection.exchange(
+        EXCHANGE,
+        { type: "direct", durable: false },
+        (exchange) => resolve({ connection, exchange })
+      );
+    });
+
+    connection.on("error", reject);
   });
-
-  return connection;
 }
 
 async function run() {
