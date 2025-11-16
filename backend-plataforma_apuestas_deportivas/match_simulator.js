@@ -18,43 +18,50 @@ async function run() {
   connection.on("ready", () => {
     console.log("Connectado a RabbitMQ");
 
-    connection.queue("alertas inmediatas", { durable: true }, (queue) => {
-      console.log("Cola lista: alertas inmediatas");
+    connection.exchange(
+      "alertas exchange",
+      { type: "direct", durable: true },
+      (exchange) => {
+        connection.queue("alertas inmediatas", { durable: true }, (queue) => {
+          queue.bind(exchange, "alerta_key"),
+            console.log("Cola lista: alertas inmediatas");
 
-      setInterval(async () => {
-        const matchId = "MATCH-001";
+          setInterval(async () => {
+            const matchId = "MATCH-001";
 
-        const oldOdds = parseFloat((Math.random() * 3).toFixed(2));
-        const newOdds = parseFloat((Math.random() * 3).toFixed(2));
+            const oldOdds = parseFloat((Math.random() * 3).toFixed(2));
+            const newOdds = parseFloat((Math.random() * 3).toFixed(2));
 
-        await producer.send({
-          topic: "match_events",
-          messages: [
-            {
-              key: matchId,
-              value: JSON.stringify({
-                type: "ODDS_UPDATED",
-                matchId,
-                newOdds,
-                timestamp: Date.now(),
-              }),
-            },
-          ],
+            await producer.send({
+              topic: "match_events",
+              messages: [
+                {
+                  key: matchId,
+                  value: JSON.stringify({
+                    type: "ODDS_UPDATED",
+                    matchId,
+                    newOdds,
+                    timestamp: Date.now(),
+                  }),
+                },
+              ],
+            });
+
+            const alerta = {
+              type: "NUEVA_CUOTA",
+              matchId,
+              oldOdds,
+              newOdds,
+              change: (newOdds - oldOdds).toFixed(2),
+              timestamp: Date.now(),
+            };
+
+            exchange.publish(alerta);
+            console.log("Alerta enviada: ", alerta);
+          }, 5000);
         });
-
-        const alerta = {
-          type: "NUEVA_CUOTA",
-          matchId,
-          oldOdds,
-          newOdds,
-          change: (newOdds - oldOdds).toFixed(2),
-          timestamp: Date.now(),
-        };
-
-        queue.publish(alerta);
-        console.log("Alerta enviada: ", alerta);
-      }, 5000);
-    });
+      }
+    );
   });
 
   connection.on("error", (err) => {
