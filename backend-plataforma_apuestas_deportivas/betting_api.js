@@ -1,5 +1,5 @@
 const { Kafka } = require("kafkajs");
-const { amqp } = require("amqp");
+const amqp = require("amqp");
 
 const kafka = new Kafka({
   clientId: "betting-api",
