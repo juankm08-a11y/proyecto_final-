@@ -38,9 +38,6 @@ async function run() {
       }, 5000);
     }
   );
-  connection.on("error", (err) => {
-    console.error(`Error al conectar RabbitMQ ${err}`);
-  });
 }
 
-run().catch(console.error);
+run();
