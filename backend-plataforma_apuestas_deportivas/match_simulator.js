@@ -56,7 +56,7 @@ async function run() {
               timestamp: Date.now(),
             };
 
-            exchange.publish(alerta);
+            exchange.publish("alerta_key", alerta);
             console.log("Alerta enviada: ", alerta);
           }, 5000);
         });
