@@ -6,7 +6,7 @@ const kafka = new Kafka({
   brokers: ["kafka:9092"],
 });
 
-const producer = kafka.producer;
+const producer = kafka.producer();
 const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 
 async function run() {
