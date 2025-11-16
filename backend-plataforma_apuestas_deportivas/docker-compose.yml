@@ -98,7 +98,7 @@ services:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
   email_worker:
-    build: ./email_worker
+    build: .
     command: node email_worker.js
     depends_on:
       - rabbitmq
