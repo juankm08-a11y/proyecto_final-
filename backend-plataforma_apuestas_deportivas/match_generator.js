@@ -23,8 +23,7 @@ async function run() {
     { type: "direct", durable: true },
     (exchange) => {
       setInterval(async () => {
-        const matchId = `m${Math.floor(Math.random() * 1000)}`;
-        const teams = ["TeamA", "TeamB"];
+        const matchId = `m${Math.floor(Math.random() * 999)}`;
         const event = { event_type: "MATCH_CREATE", match_id: matchId, teams };
 
         console.log(`Nuevo partido: ${event}`);
@@ -35,7 +34,7 @@ async function run() {
         });
 
         exchange.publish("match_simulator", { match_id: matchId });
-        console.log(`Partido ${matchId} enviado a (RabbitMQ)`);
+        console.log(`Partido enviado a (RabbitMQ)`);
       }, 5000);
     }
   );
