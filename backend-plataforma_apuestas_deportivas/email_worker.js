@@ -24,10 +24,6 @@ async function run() {
       }
     );
   });
-
-  connection.on("error", (err) => {
-    console.error(`Error en RabbitMQ ${err}`);
-  });
 }
 
-run().catch(console.error);
+run();
