@@ -9,6 +9,7 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
+const ROUTING_KEY = "match.alert";
 
 async function conectRabbit() {
   return new Promise((resolve, reject) => {
