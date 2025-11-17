@@ -6,7 +6,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     healthcheck:
-      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,9 +24,9 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:PLAINTEXT
       KAFKA_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
+
     healthcheck:
-      test:
-        ["CMD", "kafka-topics", "--list", "--boostrap-server", "localhost:9092"]
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
       interval: 10s
       timeout: 30s
       retries: 5
@@ -49,10 +49,12 @@ services:
 
   betting_api:
     build: .
-    command: node betting_api.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node betting_api.js"
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
@@ -61,49 +63,61 @@ services:
 
   match_generator:
     build: .
-    command: node match_generator.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node match_generator.js"
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
   match_simulator:
     build: .
-    command: node match_simulator.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node match_simulator.js"
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
   results_engine:
     build: .
-    command: node results_engine.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node results_engine.js"
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
   dashboard_backend:
     build: .
-    command: node dashboard_backend.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node dashboard_backend.js"
     ports:
       - "8081:8081"
     depends_on:
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
   email_worker:
     build: .
-    command: node email_worker.js
+    command: sh -c "./wait-for-kafka.sh kafka 9092 && node email_worker.js"
     depends_on:
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
     restart: always
