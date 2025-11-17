@@ -3,14 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <title>Plataforma de Apuestas</title>
-
-    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <h1>Partidos Disponibles</h1>
 
     <div class="match-list">
-      <script src="app.js"></script>
+      <script>
+        const ws = new WebSocket("ws://localhost:8082");
+
+        ws.onmessage = (msg) => {
+          const div = document.createElement("div");
+          div.className = "alerta";
+          div.textContent = msg.data;
+          document.body.appendChild(div);
+        };
+      </script>
     </div>
   </body>
 </html>
