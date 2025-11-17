@@ -2,8 +2,8 @@ const { Kafka } = require("kafkajs");
 const amqp = require("amqp");
 const express = require("express");
 const mysql = require("mysql2/promise");
-
 const app = express();
+
 app.use(express.json());
 
 const kafka = new Kafka({
@@ -13,11 +13,27 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
-const db = await mysql.createPool({
-  host: "mysql",
-  user: "root",
-  password: "apuestas_deportivas",
-});
+let db;
+async function initDB() {
+  db = await mysql.createPool({
+    host: "mysql",
+    user: "root",
+    password: "juan03",
+    database: "apuestas_deportivas",
+  });
+
+  await db.query(
+    `
+    CREATE TABLE IF NOT EXISTS odds_history (
+      id INT AUTO_INCREMENT, 
+      match_id VARCHAR(50), 
+      odds DECIMAL (5,2),
+      timestamp DATETIME DEFAULT NOW()
+    )`
+  );
+
+  console.log("Conectado correctamente a MySQL");
+}
 
 const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
@@ -33,7 +49,10 @@ async function connectRabbit() {
       connection.exchange(
         EXCHANGE,
         { type: "direct", durable: false },
-        (exchange) => resolve({ connection, exchange })
+        (exchange) => {
+          exchangeGlobal = exchange;
+          resolve(exchange);
+        }
       );
     });
 
@@ -41,10 +60,15 @@ async function connectRabbit() {
   });
 }
 
-async () => {
+async function init() {
   await producer.connect();
-  var { exchange } = await connectRabbit();
-};
+  await initDB();
+  await connectRabbit();
+
+  console.log("Api lista");
+}
+
+init();
 
 app.post("/odds", async (req, res) => {
   const { matchId, newOdds } = req.body;
@@ -52,20 +76,27 @@ app.post("/odds", async (req, res) => {
   if (!matchId || !newOdds)
     return res.status(400).json({ error: "Datos incompletos" });
 
-  await db.query(
-    "INSERT INTO odds_history (match_id,odds,timestamp) VALUES (?,?,NOW())",
-    [matchId, newOdds]
-  );
-
   await producer.send({
     topic: "bettings_events",
     messages: [{ key: matchId, value: JSON.stringify({ matchId, newOdds }) }],
   });
 
-  exchange.publish(
-    ROUTING_KEY,
-    Buffer.from(`Nueva cuota ${newOdds} para ${matchId}`)
-  );
+  await db.query("INSERT INTO odds_history (match_id,odds) VALUES (?,?)", [
+    matchId,
+    newOdds,
+  ]);
+
+  await producer.send({
+    topic: "bettings_events",
+    messages: [{ key: matchId, value: JSON.stringify({ Math, newOdds }) }],
+  });
+
+  if (exchangeGlobal) {
+    exchangeGlobal.publish(
+      ROUTING_KEY,
+      Buffer.from(`Nueva cuota ${newOdds} para ${matchId}`)
+    );
+  }
 
   res.json({ message: "Cuota enviada correctamente" });
 });
