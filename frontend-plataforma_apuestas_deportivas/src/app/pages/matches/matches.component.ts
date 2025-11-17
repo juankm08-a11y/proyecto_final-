@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Match } from '../../models/match.model';
 import { MatchController } from '../../controllers/match.controller';
+import { MatchCardComponent } from '../../components/match-card/match-card.component';
+import { NgForOf } from '../../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
 
 @Component({
   selector: 'app-matches',
-  imports: [],
+  imports: [MatchCardComponent, NgForOf],
   templateUrl: './matches.component.html',
   styleUrl: './matches.component.scss',
 })
