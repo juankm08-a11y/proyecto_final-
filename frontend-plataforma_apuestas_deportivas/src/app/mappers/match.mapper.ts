@@ -1,3 +1,4 @@
+import { MatchDTO } from '../dto/match.dto';
 import { Match } from '../models/match.model';
 
 export class MatchMapper {
@@ -12,13 +13,13 @@ export class MatchMapper {
     } as Match;
   }
 
-  static toApi(model: Match) {
+  static toDTO(model: Match): MatchDTO {
     return {
       matchId: model.id,
       homeTeam: model.homeTeam,
       awayTeam: model.awayTeam,
       startAt: model.startAt,
-      odds: model.odds,
+      odds: model.odds ?? {},
     };
   }
 }
