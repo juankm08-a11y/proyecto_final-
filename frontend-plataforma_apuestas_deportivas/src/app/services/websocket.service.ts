@@ -21,8 +21,6 @@ export class WebsocketService {
     return this.socket$.asObservable();
   }
 
-  listen(event: string): Observable<any>;
-
   send(msg: any) {
     this.socket$?.next(msg);
   }
