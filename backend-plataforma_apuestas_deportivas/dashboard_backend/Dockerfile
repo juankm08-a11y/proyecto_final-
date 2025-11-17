@@ -7,4 +7,4 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "betting_api.js"]
+CMD ["node", "dashboard_backend.js"]
