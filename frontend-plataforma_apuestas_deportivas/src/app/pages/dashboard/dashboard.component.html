@@ -1,9 +1,0 @@
-<div class="dashoard">
-  <h2>Alertas en Tiempo Real!</h2>
-  <ul>
-    <li *ngFor="let alert of alerts">
-      {{ alert.type }} | {{ alert.matchId }} | Cambio: {{ alert.change }} |
-      {{ alert.timestamp | date : "shortTime" }}
-    </li>
-  </ul>
-</div>

@@ -1,0 +1,21 @@
+{
+  "name": "plataforma_apuestas_deportivas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juankm08-a11y/proyecto_final-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/juankm08-a11y/proyecto_final-/issues"
+  },
+  "homepage": "https://github.com/juankm08-a11y/proyecto_final-#readme"
+}
