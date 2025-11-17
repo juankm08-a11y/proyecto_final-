@@ -22,5 +22,3 @@ export class MatchMapper {
     };
   }
 }
-
-print('Actualizando match mapper');
