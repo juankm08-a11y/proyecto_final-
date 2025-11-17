@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f6f6f6;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.match-list {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.match {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.match strong {
+  color: #0077cc;
+}
