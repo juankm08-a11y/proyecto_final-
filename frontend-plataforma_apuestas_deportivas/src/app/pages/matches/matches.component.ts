@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Match } from '../../models/match.model';
 import { MatchController } from '../../controllers/match.controller';
 import { MatchCardComponent } from '../../components/match-card/match-card.component';
-import { NgForOf } from '../../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
+import { NgForOf } from '@angular/common';
 
 @Component({
   selector: 'app-matches',

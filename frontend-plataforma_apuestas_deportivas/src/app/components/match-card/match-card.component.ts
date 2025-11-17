@@ -1,9 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Match } from '../../models/match.model';
-import {
-  CommonModule,
-  NgIf,
-} from '../../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
+import { CommonModule, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-match-card',
