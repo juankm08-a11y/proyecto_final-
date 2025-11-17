@@ -12,15 +12,17 @@ services:
       retries: 5
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     depends_on:
       zookeeper:
         condition: service_healthy
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS:PLAINTEXT:
-      KAFKA_OFFSETS_TOPIC_APPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENERS_SECURITY_PROTOCOL: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:PLAINTEXT
+      KAFKA_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
     healthcheck:
       test:
