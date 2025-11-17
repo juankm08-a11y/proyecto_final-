@@ -19,11 +19,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
     healthcheck:
@@ -55,43 +53,63 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: betting
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   betting_api:
-    build: .
+    build: ./betting_api
     command: node betting_api.js
     depends_on:
       - kafka
       - rabbitmq
+      - mysql
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DB: betting
     ports:
       - "8080:8080"
 
-  results_engine:
-    build: .
-    command: node results_engine.js
+  dashboard_backend:
+    build: ./dashboard_backend
+    command: node dashboard_backend.js
     depends_on:
-      - kafka
       - rabbitmq
     environment:
-      KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
-
-  dashboard_backend:
-    build: .
-    command: node dashboard_backend.js
     ports:
       - "8081:8081"
-    depends_on:
-      - rabbitmq
-    environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+      - "8082:8082"
 
   email_worker:
-    build: .
+    build: ./email_worker
     command: node email_worker.js
     depends_on:
       - rabbitmq
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
     restart: always
+
+  results_engine:
+    build: ./results_engine
+    command: node results_engine.js
+    depends_on:
+      - rabbitmq
+      - kafka
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+      KAFKA_BROKER: kafka:9092
+
+volumes:
+  mysql_data:
