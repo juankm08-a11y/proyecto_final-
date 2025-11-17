@@ -2,7 +2,7 @@ import { OddsDto } from '../dto/odds.dto';
 import { Odds } from '../models/odds_model';
 
 export class OddsMapper {
-  static fromApi(model: Odds): OddsDto {
+  static toDTO(model: Odds): OddsDto {
     return {
       matchId: model.matchId,
       newOdds: model.newOdds,
