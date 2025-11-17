@@ -3,77 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <title>Plataforma de Apuestas</title>
-    <link rel="icon" href="favicon.ico" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-      }
-      h1 {
-        color: #2c3e50;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      li {
-        margin-bottom: 8px;
-      }
-    </style>
+
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Partidos</h1>
-    <ul id="matches"></ul>
-    <p id="status"></p>
+    <h1>Partidos Disponibles</h1>
 
-    <script>
-      async function loadMatches() {
-        const status = document.getElementById("status");
-        try {
-          const res = await fetch("/matches"); // Asegúrate que tu backend JS sirve esta ruta
-
-          if (!res.ok) {
-            throw new Error(`Error al cargar los partidos: ${res.status}`);
-          }
-
-          const matches = await res.json();
-          const list = document.getElementById("matches");
-          list.innerHTML = "";
-
-          matches.forEach((m) => {
-            const li = document.createElement("li");
-            const start = new Date(m.startAt).toLocaleString();
-            li.textContent = `${m.homeTeam} vs ${m.awayTeam} - Inicio: ${start}`;
-            list.appendChild(li);
-          });
-
-          status.textContent = `Se cargaron ${matches.length} partidos.`;
-        } catch (err) {
-          console.error(err);
-          status.textContent =
-            "No se pudieron cargar los partidos. Verifica que el backend esté corriendo.";
-
-          // Datos simulados mientras pruebas
-          const simulatedMatches = [
-            { homeTeam: "A", awayTeam: "B", startAt: new Date().toISOString() },
-            {
-              homeTeam: "C",
-              awayTeam: "D",
-              startAt: new Date(Date.now() + 3600_000).toISOString(),
-            },
-          ];
-          const list = document.getElementById("matches");
-          list.innerHTML = "";
-          simulatedMatches.forEach((m) => {
-            const li = document.createElement("li");
-            const start = new Date(m.startAt).toLocaleString();
-            li.textContent = `${m.homeTeam} vs ${m.awayTeam} - Inicio: ${start} (Simulado)`;
-            list.appendChild(li);
-          });
-        }
-      }
-
-      loadMatches();
-    </script>
+    <div class="match-list">
+      <script src="app.js"></script>
+    </div>
   </body>
 </html>
