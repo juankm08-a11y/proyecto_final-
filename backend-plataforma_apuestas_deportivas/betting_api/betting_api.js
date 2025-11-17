@@ -2,8 +2,8 @@ const { Kafka } = require("kafkajs");
 const amqp = require("amqp");
 const express = require("express");
 const mysql = require("mysql2/promise");
-const app = express();
 
+const app = express();
 app.use(express.json());
 
 const kafka = new Kafka({

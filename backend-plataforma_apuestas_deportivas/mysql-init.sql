@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS odds_history (
-    id BIGINT AUTOINCREMENT PRIMARY KEY,
-    match_id VARCHAR(100),
-    odds DECIMAL(10,4),
-    timestamp TIMESTAMP DEFAULT CURRENT_TIME
-);
