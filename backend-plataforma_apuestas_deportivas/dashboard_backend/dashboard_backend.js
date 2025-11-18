@@ -61,9 +61,31 @@ async function connectRabbit() {
                 try {
                   const data = JSON.parse(alerta);
                   if (data.match_id) {
-                    matches[data.match_id] = data;
+                    if (data.teamA && data.teamB) {
+                      matches[data.match_id] = data;
+                    } else if (data.teams && data.teams.length === 2) {
+                      matches[data.match_id] = {
+                        ...data,
+                        teamA: data.teams[0],
+                        teamB: data.teams[1],
+                      };
+                    } else {
+                      matches[data.match_id] = {
+                        ...data,
+                        teamA: data.teams?.[0] || "Equipo1",
+                        teamB: data.teams?.[0] || "Equipo2",
+                      };
+                    }
+
+                    if (data.event_type === "ODDS_UPDATED") {
+                      matches[data.match_id].odds =
+                        matches[data.match_id].odds || {};
+                      matches[data.match_id].odda[data.team] = data.odds;
+                    }
                   }
-                } catch (e) {}
+                } catch (e) {
+                  console.error("error parseando alerta: ", e);
+                }
                 broadcast(alerta);
               });
             });
