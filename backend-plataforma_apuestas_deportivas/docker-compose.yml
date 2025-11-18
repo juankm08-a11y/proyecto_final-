@@ -81,24 +81,6 @@ services:
       - "8081:8081"
       - "8082:8082"
 
-  email_worker:
-    build: ./email_worker
-    command: node email_worker.js
-    depends_on:
-      - rabbitmq
-    restart: always
-    environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
-
-  results_engine:
-    build: ./results_engine
-    command: node results_engine.js
-    depends_on:
-      - rabbitmq
-      - kafka
-    environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
-      KAFKA_BROKER: kafka:9092
 
 volumes:
   mysql_data:
