@@ -22,7 +22,9 @@ app.use(express.static(path.join(__dirname, "public")));
 const wss = new WebSocket.Server({ server });
 
 function broadcast(msg) {
-  wss.clients.forEach((c) => c.readyState === WebSocket.OPEN && c.send(msg));
+  wss.clients.forEach((c) => {
+    if (c.readyState === WebSocket.OPEN) c.send(msg);
+  });
 }
 
 const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
@@ -54,15 +56,15 @@ async function connectRabbit() {
   }
 }
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hola Mundo desde api con dockersql" });
 });
 
-app.listen(8081, "0.0.0.0", () => {
-  console.log("Dashboard API en 8081");
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+server.listen(8081, "0.0.0.0", () => {
+  console.log("Dashboard API con HTTPS en 8081");
   connectRabbit();
 });
