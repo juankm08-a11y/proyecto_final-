@@ -63,3 +63,24 @@ services:
       - "8081:8081"
       - "8082:8082"
 
+  match_generator: 
+   build: ./match_generator
+   container_name: match_generator
+   environment: 
+    - KAFKA_BROKER: kafka:9092
+    - RABBITMQ_URL: amqp://guest:guest@rabbitmq
+    - MATCH_DURATION_MS: 300000
+    - CREATE_INTERVAL_MS: 10000
+  depends_on: 
+    - kafka 
+    - rabbitmq
+
+match_simulator: 
+ build: ./match_simulator
+ container_name: match_simulator
+ environment: 
+  - KAFKA_BROKER: kafka:9092
+  - RABBITMQ_URL: amqp://guest:guest@rabbitmq
+ depends_on: 
+  - kafka
+  - rabbitmq
