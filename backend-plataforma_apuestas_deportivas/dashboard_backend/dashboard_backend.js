@@ -78,8 +78,7 @@ async function connectRabbit() {
                     }
 
                     if (data.event_type === "ODDS_UPDATED") {
-                      matches[data.match_id].odds =
-                        matches[data.match_id].odds || {};
+                      matches[data.match_id].odds = matches[data.match_id].odds || {};
                       matches[data.match_id].odda[data.team] = data.odds;
                     }
                   }
