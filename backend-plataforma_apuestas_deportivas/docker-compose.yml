@@ -42,31 +42,13 @@ services:
       timeout: 5s
       retries: 5
 
-  mysql:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: juan03
-      MYSQL_DATABASE: apuestas_deportivas
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
   betting_api:
     build: ./betting_api
     command: node betting_api.js
     depends_on:
       - kafka
       - rabbitmq
-      - mysql
-    environment:
-      KAFKA_BROKER: kafka:9092
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
-      MYSQL_HOST: mysql
-      MYSQL_USER: root
-      MYSQL_PASSWORD: juan03
-      MYSQL_DB: apuestas_deportivas
+   
     ports:
       - "8080:8080"
 
@@ -81,6 +63,3 @@ services:
       - "8081:8081"
       - "8082:8082"
 
-
-volumes:
-  mysql_data:
