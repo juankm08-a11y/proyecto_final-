@@ -13,14 +13,17 @@ async function run() {
     connection.exchange(
       EXCHANGE,
       { type: "direct", durable: false },
-      (exchage) => {
+      (exchange) => {
+
         connection.queue("", { exclusive: true }, (queue) => {
           queue.bind(EXCHANGE, ROUTING_KEY);
+
           queue.subscribe((message) => {
             const msg = message.data.toString();
-            console.log(`Mensaje recibido: ${msg.data.toString()}`);
+            console.log("Mensaje recibido:", msg);
           });
         });
+
       }
     );
   });
