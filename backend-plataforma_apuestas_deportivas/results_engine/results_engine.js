@@ -27,6 +27,10 @@ async function run() {
       }
     );
   });
+
+  connection.on("error",(err) => {
+    console.error("Error en resuts engine RabbitMQ",err)
+  })
 }
 
 run();
